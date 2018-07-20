@@ -1,0 +1,11 @@
+.git/
+data/
+db/
+
+*.log
+*.txt
+*.tmp
+*.log
+*.bak
+*.swp
+.gitignore

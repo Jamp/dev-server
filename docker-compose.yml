@@ -1,0 +1,102 @@
+version: '3'
+services:
+  web:
+    container_name: nginx_test
+    image: 'nginx:stable-alpine'
+    volumes:
+      - './nginx/default.conf:/etc/nginx/conf.d/default.conf'
+      - './nginx/proxy_reverse.conf:/etc/nginx/proxy_reverse.conf'
+      - './nginx/websocket.conf:/etc/nginx/websocket.conf'
+      - './nginx/logs:/var/log/nginx'
+    ports:
+      - '80:80'
+    environment:
+      - NGINX_PORT=80
+    command:
+      - nginx-debug
+      - '-g'
+      - daemon off;
+    depends_on:
+      - api
+      - webapp
+    links:
+      - api
+      - webapp
+
+  api:
+    container_name: backend_test
+    build:
+      context: ./backend
+    volumes:
+      - './backend:/app'
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - TWITTER_CONSUMER_KEY=aNhHb0OjL4Us6tnvrgrVQ
+      - TWITTER_CONSUMER_SECRET=o6XqXanRtDFl81vIL3u5IOD9iZd1ODkLN3JhOFs
+      - 'MONGODB_URL=mongodb://developer:123@mongo/developer'
+      - 'POSTGRESQL_URL=postgres://developer:123@postgres/developer'
+    depends_on:
+      - postgres
+      - mongo
+    links:
+      - postgres
+      - mongo
+
+  webapp:
+    container_name: frontend_test
+    build:
+      context: ./frontend
+    volumes:
+      - './frontend:/app'
+    ports:
+      - '2000:2000'
+    environment:
+      - HOST=0.0.0.0
+      - NODE_ENV=development
+      - PORT=2000
+
+  twitter:
+    container_name: twitter_test
+    build:
+      context: ./twitter
+    environment:
+      - ENVIROMENT=development
+      - TWITTER_CONSUMER_KEY=aNhHb0OjL4Us6tnvrgrVQ
+      - TWITTER_CONSUMER_SECRET=o6XqXanRtDFl81vIL3u5IOD9iZd1ODkLN3JhOFs
+      - 'MONGODB_URL=mongodb://developer:123@mongo/developer'
+      - 'POSTGRESQL_URL=postgres://developer:123@postgres/developer'
+    depends_on:
+      - postgres
+      - mongo
+    links:
+      - postgres
+      - mongo
+
+  postgres:
+    container_name: postgres_test
+    image: 'postgres:10.2'
+    environment:
+      - POSTGRES_USER=developer
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=developer
+    volumes:
+      - './data/postgres:/var/lib/postgresql/data'
+    ports:
+      - '5432:5432'
+
+  mongo:
+    container_name: mongo_test
+    build:
+      context: ./mongo
+    environment:
+      MONGO_ADMIN_PASSWORD: 123
+      MONGO_USER: developer
+      MONGO_PASSWORD: 123
+      MONGO_DB: developer
+    volumes:
+      - './data/mongo:/data/db'
+    ports:
+      - '27017:27017'
