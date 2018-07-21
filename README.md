@@ -7,7 +7,7 @@ livereload tanto para el Backend con el Frontend.
 ```bash
 # Para iniciar
 git clone --recurse-submodules https://github.com/Jamp/dev-server.git
-cd tooldata
+cd dev-server
 docker-compose up
 
 # Para actualizar todo
