@@ -8,6 +8,10 @@ livereload tanto para el Backend con el Frontend.
 # Para iniciar
 git clone --recurse-submodules https://github.com/Jamp/dev-server.git
 cd dev-server
+
+cd frontend && yarn && cd ..
+cd backend && npm install && cd ..
+
 docker-compose up
 
 # Para actualizar todo
